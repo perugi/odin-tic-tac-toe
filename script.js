@@ -12,5 +12,13 @@ const gameboard = (() => {
     console.table(board);
   }
 
-  return { board };
+  function getBoard() {
+    return board;
+  }
+
+  function setCharacter(row, col, char) {
+    board[row][col] = char;
+  }
+
+  return { getBoard, setCharacter };
 })();
