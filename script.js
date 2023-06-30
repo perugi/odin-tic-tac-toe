@@ -17,7 +17,12 @@ const gameboard = (() => {
   }
 
   function setCharacter(row, col, char) {
-    board[row][col] = char;
+    if (board[row][col] === " ") {
+      board[row][col] = char;
+      return true;
+    } else {
+      return false;
+    }
   }
 
   return { getBoard, setCharacter };
