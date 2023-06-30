@@ -16,13 +16,21 @@ const gameboard = (() => {
     return board;
   }
 
+  function _isCharValid(char) {
+    return char === "x" || char === "o";
+  }
+
+  function _isSpaceEmpty(row, col) {
+    return board[row][col] === " ";
+  }
+
   function setCharacter(row, col, char) {
-    if (board[row][col] === " ") {
-      board[row][col] = char;
-      return true;
-    } else {
+    if (!_isCharValid(char) || !_isSpaceEmpty(row, col)) {
       return false;
     }
+
+    board[row][col] = char;
+    return true;
   }
 
   return { getBoard, setCharacter };
