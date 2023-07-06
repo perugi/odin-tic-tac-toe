@@ -35,3 +35,11 @@ const gameboard = (() => {
 
   return { getBoard, setCharacter };
 })();
+
+const Player = (symbol) => {
+  return { symbol };
+};
+
+const newPlayer = Player("X");
+console.log(newPlayer);
+console.log(newPlayer.symbol);
