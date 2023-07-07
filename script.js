@@ -36,10 +36,11 @@ const gameboard = (() => {
   return { getBoard, setCharacter };
 })();
 
-const Player = (symbol) => {
-  return { symbol };
+const Player = (symbol, isAI) => {
+  return { symbol, isAI };
 };
 
-const newPlayer = Player("X");
+const newPlayer = Player("X", false);
 console.log(newPlayer);
 console.log(newPlayer.symbol);
+console.log(newPlayer.isAI);
