@@ -1,20 +1,25 @@
 const gameboard = (() => {
-  let board = _createBlankBoard();
+  let board = [];
+  const DIMENSION = 3;
 
-  function _createBlankBoard() {
-    let board = [];
-    for (let i = 0; i < 3; i++) {
-      board[i] = [];
-      for (let j = 0; j < 3; j++) {
-        board[i].push(" ");
-      }
+  // Initialize the board to a square array of empty spaces.
+  for (let i = 0; i < DIMENSION; i++) {
+    board.push([]);
+    for (let j = 0; j < DIMENSION; j++) {
+      board[i].push(" ");
     }
-
-    return board;
   }
 
   function getBoard() {
     return board;
+  }
+
+  function printBoard() {
+    console.log(board[0][0] + " | " + board[0][1] + " | " + board[0][2]);
+    console.log("---+---+---");
+    console.log(board[1][0] + " | " + board[1][1] + " | " + board[1][2]);
+    console.log("---+---+---");
+    console.log(board[2][0] + " | " + board[2][1] + " | " + board[2][2]);
   }
 
   function _isCharValid(char) {
@@ -40,6 +45,8 @@ const gameboard = (() => {
 const Player = (symbol) => {
   return { symbol };
 };
+
+const gameController = (() => {})();
 
 const newPlayer = Player("X");
 console.log(newPlayer);
