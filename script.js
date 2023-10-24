@@ -25,7 +25,7 @@ const Cell = () => {
   return { getValue, setValue };
 };
 
-const gameboard = (() => {
+const Gameboard = () => {
   let board = [];
 
   // Initialize the board to a square array of empty spaces.
@@ -145,10 +145,47 @@ const gameboard = (() => {
   }
 
   return { getBoard, setCharacter, detectWinner, isTie, printBoard };
-})();
-
-const Player = (symbol) => {
-  return { symbol };
 };
 
-const gameController = (() => {})();
+const Player = (name, symbol) => {
+  return { name, symbol };
+};
+
+const gameController = (() => {
+  const board = Gameboard();
+  const players = [Player("Player 1", "x"), Player("Player 2", "o")];
+
+  let currentPlayer = players[0];
+  _printRound();
+
+  function _switchPlayerTurn() {
+    currentPlayer = currentPlayer === players[0] ? players[1] : players[0];
+  }
+
+  function _printRound() {
+    board.printBoard();
+    console.log("It is " + currentPlayer.name + "'s turn.");
+  }
+
+  function playRound(row, col) {
+    if (board.setCharacter(row, col, currentPlayer.symbol)) {
+      _printRound();
+
+      if (board.detectWinner()) {
+        console.log(currentPlayer.name + " wins!");
+        return true;
+      }
+
+      if (board.isTie()) {
+        console.log("It's a tie!");
+        return true;
+      }
+
+      _switchPlayerTurn();
+      return true;
+    }
+    return false;
+  }
+
+  return { playRound };
+})();
