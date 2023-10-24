@@ -1,3 +1,30 @@
+const Cell = () => {
+  let value = " ";
+
+  function getValue() {
+    return value;
+  }
+
+  function setValue(char) {
+    if (!_isCharValid(char) || !_isCellEmpty()) {
+      return false;
+    }
+
+    value = char;
+    return true;
+  }
+
+  function _isCharValid(char) {
+    return char === "x" || char === "o";
+  }
+
+  function _isCellEmpty() {
+    return value === " ";
+  }
+
+  return { getValue, setValue };
+};
+
 const gameboard = (() => {
   let board = [];
 
@@ -5,7 +32,7 @@ const gameboard = (() => {
   for (let i = 0; i < 3; i++) {
     board.push([]);
     for (let j = 0; j < 3; j++) {
-      board[i].push(" ");
+      board[i].push(Cell());
     }
   }
 
@@ -14,28 +41,33 @@ const gameboard = (() => {
   }
 
   function printBoard() {
-    console.log(board[0][0] + " | " + board[0][1] + " | " + board[0][2]);
+    console.log(
+      board[0][0].getValue() +
+        " | " +
+        board[0][1].getValue() +
+        " | " +
+        board[0][2].getValue()
+    );
     console.log("---+---+---");
-    console.log(board[1][0] + " | " + board[1][1] + " | " + board[1][2]);
+    console.log(
+      board[1][0].getValue() +
+        " | " +
+        board[1][1].getValue() +
+        " | " +
+        board[1][2].getValue()
+    );
     console.log("---+---+---");
-    console.log(board[2][0] + " | " + board[2][1] + " | " + board[2][2]);
-  }
-
-  function _isCharValid(char) {
-    return char === "x" || char === "o";
-  }
-
-  function _isSpaceEmpty(row, col) {
-    return board[row][col] === " ";
+    console.log(
+      board[2][0].getValue() +
+        " | " +
+        board[2][1].getValue() +
+        " | " +
+        board[2][2].getValue()
+    );
   }
 
   function setCharacter(row, col, char) {
-    if (!_isCharValid(char) || !_isSpaceEmpty(row, col)) {
-      return false;
-    }
-
-    board[row][col] = char;
-    return true;
+    return board[row][col].setValue(char);
   }
 
   function detectWinner() {
@@ -70,13 +102,13 @@ const gameboard = (() => {
   }
 
   function _getRow(row) {
-    return board[row];
+    return board[row].map((cell) => cell.getValue());
   }
 
   function _getColumn(col) {
     let column = [];
     for (let i = 0; i < board.length; i++) {
-      column.push(board[i][col]);
+      column.push(board[i][col].getValue());
     }
     return column;
   }
@@ -84,7 +116,7 @@ const gameboard = (() => {
   function _getDiagonalOne() {
     let diagonal = [];
     for (let i = 0; i < board.length; i++) {
-      diagonal.push(board[i][i]);
+      diagonal.push(board[i][i].getValue());
     }
     return diagonal;
   }
@@ -92,7 +124,7 @@ const gameboard = (() => {
   function _getDiagonalTwo() {
     let diagonal = [];
     for (let i = 0; i < board.length; i++) {
-      diagonal.push(board[i][board.length - 1 - i]);
+      diagonal.push(board[i][board.length - 1 - i].getValue());
     }
     return diagonal;
   }
@@ -100,7 +132,7 @@ const gameboard = (() => {
   function isTie() {
     for (let i = 0; i < board.length; i++) {
       for (let j = 0; j < board[0].length; j++) {
-        if (board[i][j] === " ") {
+        if (board[i][j].getValue() === " ") {
           return false;
         }
       }
@@ -108,12 +140,12 @@ const gameboard = (() => {
     return true;
   }
 
+  function _allElementsEqual(array) {
+    return array.every((element) => element === array[0]);
+  }
+
   return { getBoard, setCharacter, detectWinner, isTie, printBoard };
 })();
-
-function _allElementsEqual(array) {
-  return array.every((element) => element === array[0]);
-}
 
 const Player = (symbol) => {
   return { symbol };
