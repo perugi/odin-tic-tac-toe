@@ -1,11 +1,10 @@
 const gameboard = (() => {
   let board = [];
-  const DIMENSION = 3;
 
   // Initialize the board to a square array of empty spaces.
-  for (let i = 0; i < DIMENSION; i++) {
+  for (let i = 0; i < 3; i++) {
     board.push([]);
-    for (let j = 0; j < DIMENSION; j++) {
+    for (let j = 0; j < 3; j++) {
       board[i].push(" ");
     }
   }
@@ -39,15 +38,85 @@ const gameboard = (() => {
     return true;
   }
 
-  return { getBoard, setCharacter };
+  function detectWinner() {
+    // Check rows
+    for (let i = 0; i < board.length; i++) {
+      let row = _getRow(i);
+      if (_allElementsEqual(row) && row[0] !== " ") {
+        return row[0];
+      }
+    }
+
+    // Check columns
+    for (let i = 0; i < board.length; i++) {
+      let column = _getColumn(i);
+      if (_allElementsEqual(column) && column[0] !== " ") {
+        return column[0];
+      }
+    }
+
+    // Check diagonals
+    let diagonal = _getDiagonalOne();
+    if (_allElementsEqual(diagonal) && diagonal[0] !== " ") {
+      return diagonal[0];
+    }
+
+    diagonal = _getDiagonalTwo();
+    if (_allElementsEqual(diagonal) && diagonal[0] !== " ") {
+      return diagonal[0];
+    }
+
+    return null;
+  }
+
+  function _getRow(row) {
+    return board[row];
+  }
+
+  function _getColumn(col) {
+    let column = [];
+    for (let i = 0; i < board.length; i++) {
+      column.push(board[i][col]);
+    }
+    return column;
+  }
+
+  function _getDiagonalOne() {
+    let diagonal = [];
+    for (let i = 0; i < board.length; i++) {
+      diagonal.push(board[i][i]);
+    }
+    return diagonal;
+  }
+
+  function _getDiagonalTwo() {
+    let diagonal = [];
+    for (let i = 0; i < board.length; i++) {
+      diagonal.push(board[i][board.length - 1 - i]);
+    }
+    return diagonal;
+  }
+
+  function isTie() {
+    for (let i = 0; i < board.length; i++) {
+      for (let j = 0; j < board[0].length; j++) {
+        if (board[i][j] === " ") {
+          return false;
+        }
+      }
+    }
+    return true;
+  }
+
+  return { getBoard, setCharacter, detectWinner, isTie, printBoard };
 })();
+
+function _allElementsEqual(array) {
+  return array.every((element) => element === array[0]);
+}
 
 const Player = (symbol) => {
   return { symbol };
 };
 
 const gameController = (() => {})();
-
-const newPlayer = Player("X");
-console.log(newPlayer);
-console.log(newPlayer.symbol);
