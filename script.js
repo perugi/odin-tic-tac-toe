@@ -156,23 +156,23 @@ const gameController = (() => {
   const players = [Player("Player 1", "x"), Player("Player 2", "o")];
 
   let currentPlayer = players[0];
-  _printRound();
+  board.printBoard();
+  console.log(`It's ${currentPlayer.name}'s turn.`);
 
   function _switchPlayerTurn() {
     currentPlayer = currentPlayer === players[0] ? players[1] : players[0];
   }
 
-  function _printRound() {
-    board.printBoard();
-    console.log("It is " + currentPlayer.name + "'s turn.");
+  function getCurrentPlayer() {
+    return currentPlayer;
   }
 
   function playRound(row, col) {
     if (board.setCharacter(row, col, currentPlayer.symbol)) {
-      _printRound();
+      board.printBoard();
 
       if (board.detectWinner()) {
-        console.log(currentPlayer.name + " wins!");
+        console.log(`${currentPlayer.name} wins!`);
         return true;
       }
 
@@ -182,10 +182,51 @@ const gameController = (() => {
       }
 
       _switchPlayerTurn();
+      console.log(`It's ${currentPlayer.name}'s turn.`);
       return true;
     }
     return false;
   }
 
-  return { playRound };
+  return { playRound, getCurrentPlayer, getBoard: board.getBoard };
 })();
+
+const screenController = ((gameController) => {
+  const gameboard = document.querySelector(".gameboard");
+  const playerTurn = document.querySelector(".player-turn");
+
+  updateScreen();
+
+  function updateScreen() {
+    const activePlayer = gameController.getCurrentPlayer();
+    playerTurn.textContent = `It's ${activePlayer.name}'s turn.`;
+
+    const board = gameController.getBoard;
+    gameboard.innerHTML = "";
+
+    for (let i = 0; i < board.length; i++) {
+      for (let j = 0; j < board[0].length; j++) {
+        const boardCell = document.createElement("div");
+        boardCell.classList.add("board-cell");
+
+        boardCell.dataset.row = i;
+        boardCell.dataset.col = j;
+        boardCell.textContent = board[i][j].getValue();
+
+        gameboard.appendChild(boardCell);
+      }
+    }
+  }
+
+  function _clickBoardCell(e) {
+    const row = e.target.dataset.row;
+    const col = e.target.dataset.col;
+
+    if (game.playRound(row, col)) {
+      _updateScreen();
+    }
+  }
+  gameboard.addEventListener("click", _clickBoardCell);
+
+  return { updateScreen };
+})(gameController);
