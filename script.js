@@ -26,13 +26,16 @@ const Cell = () => {
 };
 
 const Gameboard = () => {
-  let board = [];
+  let board;
+  initializeBoard();
 
-  // Initialize the board to a square array of empty spaces.
-  for (let i = 0; i < 3; i++) {
-    board.push([]);
-    for (let j = 0; j < 3; j++) {
-      board[i].push(Cell());
+  function initializeBoard() {
+    board = [];
+    for (let i = 0; i < 3; i++) {
+      board.push([]);
+      for (let j = 0; j < 3; j++) {
+        board[i].push(Cell());
+      }
     }
   }
 
@@ -144,7 +147,14 @@ const Gameboard = () => {
     return array.every((element) => element === array[0]);
   }
 
-  return { getBoard, setCharacter, detectWinner, isTie, printBoard };
+  return {
+    getBoard,
+    setCharacter,
+    detectWinner,
+    isTie,
+    printBoard,
+    initializeBoard,
+  };
 };
 
 const Player = (name, symbol) => {
@@ -155,11 +165,7 @@ const gameController = (() => {
   const board = Gameboard();
   const players = [Player("Player 1", "x"), Player("Player 2", "o")];
 
-  let currentPlayer = players[0];
-  let winner = null;
-
-  board.printBoard();
-  console.log(`It's ${currentPlayer.name}'s turn.`);
+  newGame();
 
   function _switchPlayerTurn() {
     currentPlayer = currentPlayer === players[0] ? players[1] : players[0];
@@ -171,6 +177,15 @@ const gameController = (() => {
 
   function getWinner() {
     return winner;
+  }
+
+  function newGame() {
+    board.initializeBoard();
+    currentPlayer = players[0];
+    winner = null;
+
+    board.printBoard();
+    console.log(`It's ${currentPlayer.name}'s turn.`);
   }
 
   function playRound(row, col) {
@@ -196,14 +211,20 @@ const gameController = (() => {
     return false;
   }
 
-  return { playRound, getCurrentPlayer, getBoard: board.getBoard, getWinner };
+  return {
+    playRound,
+    getCurrentPlayer,
+    getBoard: board.getBoard,
+    getWinner,
+    newGame,
+  };
 })();
 
 const screenController = ((gameController) => {
   const gameboard = document.querySelector(".gameboard");
   const gameInfo = document.querySelector(".game-info");
 
-  updateScreen();
+  _startNewGame();
 
   function updateScreen() {
     const board = gameController.getBoard();
@@ -229,6 +250,7 @@ const screenController = ((gameController) => {
         gameInfo.textContent = `${gameController.getWinner()} wins!`;
       }
       gameboard.removeEventListener("click", _clickBoardCell);
+      gameboard.addEventListener("click", _startNewGame);
     } else {
       gameInfo.textContent = `It's ${gameController.getCurrentPlayer().name}'s 
       [${gameController.getCurrentPlayer().symbol}] turn.`;
@@ -243,7 +265,13 @@ const screenController = ((gameController) => {
       updateScreen();
     }
   }
-  gameboard.addEventListener("click", _clickBoardCell);
+
+  function _startNewGame() {
+    gameController.newGame();
+    updateScreen();
+    gameboard.removeEventListener("click", _startNewGame);
+    gameboard.addEventListener("click", _clickBoardCell);
+  }
 
   return { updateScreen };
 })(gameController);
