@@ -178,9 +178,11 @@ const gameController = (() => {
     return winner;
   }
 
-  function newGame() {
+  function newGame(playerXName, playerOName) {
+    console.log(playerXName);
     board.initializeBoard();
-    players = [Player("Dominik", "X"), Player("Alex", "O")];
+    players = [Player(playerXName, "X"), Player(playerOName, "O")];
+    console.log(players);
     currentPlayer = players[0];
     winner = null;
 
@@ -223,6 +225,8 @@ const gameController = (() => {
 
 const screenController = (() => {
   const setupContainer = document.querySelector(".setup-container");
+  const playerXField = document.querySelector(".playerX");
+  const playerOField = document.querySelector(".playerO");
   const startButton = document.querySelector(".start-button");
   startButton.addEventListener("click", _startNewGame);
 
@@ -235,6 +239,11 @@ const screenController = (() => {
   quitButton.addEventListener("click", _renderSetupScreen);
 
   _renderSetupScreen();
+
+  function _renderSetupScreen() {
+    gameContainer.style.display = "none";
+    setupContainer.style.display = "block";
+  }
 
   function _renderGameScreen() {
     gameContainer.style.display = "block";
@@ -266,13 +275,8 @@ const screenController = (() => {
     } else {
       gameInfo.textContent = `It's ${
         gameController.getCurrentPlayer().name
-      }'s [${gameController.getCurrentPlayer().symbol}] turn.`;
+      }'s turn.`;
     }
-  }
-
-  function _renderSetupScreen() {
-    gameContainer.style.display = "none";
-    setupContainer.style.display = "block";
   }
 
   function _clickBoardCell(e) {
@@ -286,7 +290,10 @@ const screenController = (() => {
 
   function _startNewGame() {
     console.log("Starting new game");
-    gameController.newGame();
+    let playerXName = playerXField.value || "X";
+    let playerOName = playerOField.value || "O";
+    gameController.newGame(playerXName, playerOName);
+
     _renderGameScreen();
     gameboard.addEventListener("click", _clickBoardCell);
   }
