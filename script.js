@@ -260,6 +260,11 @@ const screenController = (() => {
         boardCell.dataset.row = i;
         boardCell.dataset.col = j;
         boardCell.textContent = board[i][j].getValue();
+        if (boardCell.textContent === " ") {
+          boardCell.classList.add("empty");
+        }
+        boardCell.addEventListener("mouseenter", _fillPlaceholder);
+        boardCell.addEventListener("mouseleave", _clearPlaceholder);
 
         gameboard.appendChild(boardCell);
       }
@@ -272,6 +277,12 @@ const screenController = (() => {
         gameInfo.textContent = `${gameController.getWinner()} wins!`;
       }
       gameboard.removeEventListener("click", _clickBoardCell);
+
+      let boardCells = document.querySelectorAll(".board-cell");
+      boardCells.forEach((cell) => {
+        cell.removeEventListener("mouseenter", _fillPlaceholder);
+        cell.removeEventListener("mouseleave", _clearPlaceholder);
+      });
     } else {
       gameInfo.textContent = `It's ${
         gameController.getCurrentPlayer().name
@@ -285,6 +296,7 @@ const screenController = (() => {
 
     if (gameController.playRound(row, col)) {
       _renderGameScreen();
+      console.log(e.target);
     }
   }
 
@@ -292,10 +304,24 @@ const screenController = (() => {
     console.log("Starting new game");
     let playerXName = playerXField.value || "X";
     let playerOName = playerOField.value || "O";
+    playerXField.value = "";
+    playerOField.value = "";
     gameController.newGame(playerXName, playerOName);
 
     _renderGameScreen();
     gameboard.addEventListener("click", _clickBoardCell);
+  }
+
+  function _fillPlaceholder() {
+    if (this.classList.contains("empty")) {
+      this.textContent = gameController.getCurrentPlayer().symbol;
+    }
+  }
+
+  function _clearPlaceholder() {
+    if (this.classList.contains("empty")) {
+      this.textContent = " ";
+    }
   }
 
   return {};
