@@ -163,9 +163,7 @@ const Player = (name, symbol) => {
 
 const gameController = (() => {
   const board = Gameboard();
-  const players = [Player("Player 1", "x"), Player("Player 2", "o")];
-
-  newGame();
+  let players;
 
   function _switchPlayerTurn() {
     currentPlayer = currentPlayer === players[0] ? players[1] : players[0];
@@ -179,8 +177,9 @@ const gameController = (() => {
     return winner;
   }
 
-  function newGame() {
+  function newGame(player1Name, player2Name) {
     board.initializeBoard();
+    players = [Player(player1Name, "x"), Player(player2Name, "o")];
     currentPlayer = players[0];
     winner = null;
 
@@ -220,7 +219,7 @@ const gameController = (() => {
   };
 })();
 
-const screenController = ((gameController) => {
+const screenController = (() => {
   const gameboard = document.querySelector(".gameboard");
   const gameInfo = document.querySelector(".game-info");
 
@@ -267,11 +266,11 @@ const screenController = ((gameController) => {
   }
 
   function _startNewGame() {
-    gameController.newGame();
+    gameController.newGame("Dominik", "Tamara");
     updateScreen();
     gameboard.removeEventListener("click", _startNewGame);
     gameboard.addEventListener("click", _clickBoardCell);
   }
 
   return { updateScreen };
-})(gameController);
+})();
