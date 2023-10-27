@@ -15,7 +15,7 @@ const Cell = () => {
   }
 
   function _isCharValid(char) {
-    return char === "x" || char === "o";
+    return char === "X" || char === "O";
   }
 
   function _isCellEmpty() {
@@ -164,6 +164,7 @@ const Player = (name, symbol) => {
 const gameController = (() => {
   const board = Gameboard();
   let players;
+  let currentPlayer;
 
   function _switchPlayerTurn() {
     currentPlayer = currentPlayer === players[0] ? players[1] : players[0];
@@ -177,9 +178,9 @@ const gameController = (() => {
     return winner;
   }
 
-  function newGame(player1Name, player2Name) {
+  function newGame() {
     board.initializeBoard();
-    players = [Player(player1Name, "x"), Player(player2Name, "o")];
+    players = [Player("Dominik", "X"), Player("Alex", "O")];
     currentPlayer = players[0];
     winner = null;
 
@@ -188,6 +189,7 @@ const gameController = (() => {
   }
 
   function playRound(row, col) {
+    console.log("Play round");
     if (board.setCharacter(row, col, currentPlayer.symbol)) {
       board.printBoard();
 
@@ -220,12 +222,24 @@ const gameController = (() => {
 })();
 
 const screenController = (() => {
+  const setupContainer = document.querySelector(".setup-container");
+  const startButton = document.querySelector(".start-button");
+  startButton.addEventListener("click", _startNewGame);
+
+  const gameContainer = document.querySelector(".game-container");
   const gameboard = document.querySelector(".gameboard");
   const gameInfo = document.querySelector(".game-info");
+  const restartButon = document.querySelector(".restart-button");
+  restartButon.addEventListener("click", _startNewGame);
+  const quitButton = document.querySelector(".quit-button");
+  quitButton.addEventListener("click", _renderSetupScreen);
 
-  _startNewGame();
+  _renderSetupScreen();
 
-  function updateScreen() {
+  function _renderGameScreen() {
+    gameContainer.style.display = "block";
+    setupContainer.style.display = "none";
+
     const board = gameController.getBoard();
     gameboard.innerHTML = "";
 
@@ -249,11 +263,16 @@ const screenController = (() => {
         gameInfo.textContent = `${gameController.getWinner()} wins!`;
       }
       gameboard.removeEventListener("click", _clickBoardCell);
-      gameboard.addEventListener("click", _startNewGame);
     } else {
-      gameInfo.textContent = `It's ${gameController.getCurrentPlayer().name}'s 
-      [${gameController.getCurrentPlayer().symbol}] turn.`;
+      gameInfo.textContent = `It's ${
+        gameController.getCurrentPlayer().name
+      }'s [${gameController.getCurrentPlayer().symbol}] turn.`;
     }
+  }
+
+  function _renderSetupScreen() {
+    gameContainer.style.display = "none";
+    setupContainer.style.display = "block";
   }
 
   function _clickBoardCell(e) {
@@ -261,16 +280,16 @@ const screenController = (() => {
     const col = e.target.dataset.col;
 
     if (gameController.playRound(row, col)) {
-      updateScreen();
+      _renderGameScreen();
     }
   }
 
   function _startNewGame() {
-    gameController.newGame("Dominik", "Tamara");
-    updateScreen();
-    gameboard.removeEventListener("click", _startNewGame);
+    console.log("Starting new game");
+    gameController.newGame();
+    _renderGameScreen();
     gameboard.addEventListener("click", _clickBoardCell);
   }
 
-  return { updateScreen };
+  return {};
 })();
