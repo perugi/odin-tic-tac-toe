@@ -201,7 +201,7 @@ const screenController = ((gameController) => {
     const activePlayer = gameController.getCurrentPlayer();
     playerTurn.textContent = `It's ${activePlayer.name}'s turn.`;
 
-    const board = gameController.getBoard;
+    const board = gameController.getBoard();
     gameboard.innerHTML = "";
 
     for (let i = 0; i < board.length; i++) {
@@ -222,8 +222,8 @@ const screenController = ((gameController) => {
     const row = e.target.dataset.row;
     const col = e.target.dataset.col;
 
-    if (game.playRound(row, col)) {
-      _updateScreen();
+    if (gameController.playRound(row, col)) {
+      updateScreen();
     }
   }
   gameboard.addEventListener("click", _clickBoardCell);
