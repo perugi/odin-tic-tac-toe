@@ -156,6 +156,8 @@ const gameController = (() => {
   const players = [Player("Player 1", "x"), Player("Player 2", "o")];
 
   let currentPlayer = players[0];
+  let winner = null;
+
   board.printBoard();
   console.log(`It's ${currentPlayer.name}'s turn.`);
 
@@ -167,17 +169,23 @@ const gameController = (() => {
     return currentPlayer;
   }
 
+  function getWinner() {
+    return winner;
+  }
+
   function playRound(row, col) {
     if (board.setCharacter(row, col, currentPlayer.symbol)) {
       board.printBoard();
 
       if (board.detectWinner()) {
         console.log(`${currentPlayer.name} wins!`);
+        winner = currentPlayer.name;
         return true;
       }
 
       if (board.isTie()) {
         console.log("It's a tie!");
+        winner = "tie";
         return true;
       }
 
@@ -188,19 +196,16 @@ const gameController = (() => {
     return false;
   }
 
-  return { playRound, getCurrentPlayer, getBoard: board.getBoard };
+  return { playRound, getCurrentPlayer, getBoard: board.getBoard, getWinner };
 })();
 
 const screenController = ((gameController) => {
   const gameboard = document.querySelector(".gameboard");
-  const playerTurn = document.querySelector(".player-turn");
+  const gameInfo = document.querySelector(".game-info");
 
   updateScreen();
 
   function updateScreen() {
-    const activePlayer = gameController.getCurrentPlayer();
-    playerTurn.textContent = `It's ${activePlayer.name}'s turn.`;
-
     const board = gameController.getBoard();
     gameboard.innerHTML = "";
 
@@ -215,6 +220,18 @@ const screenController = ((gameController) => {
 
         gameboard.appendChild(boardCell);
       }
+    }
+
+    if (gameController.getWinner()) {
+      if (gameController.getWinner() == "tie") {
+        gameInfo.textContent = "It's a tie!";
+      } else {
+        gameInfo.textContent = `${gameController.getWinner()} wins!`;
+      }
+      gameboard.removeEventListener("click", _clickBoardCell);
+    } else {
+      gameInfo.textContent = `It's ${gameController.getCurrentPlayer().name}'s 
+      [${gameController.getCurrentPlayer().symbol}] turn.`;
     }
   }
 
