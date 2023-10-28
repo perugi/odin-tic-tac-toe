@@ -239,6 +239,8 @@ const screenController = (() => {
   _renderSetupScreen();
 
   function _renderSetupScreen() {
+    playerXField.value = "";
+    playerOField.value = "";
     gameContainer.style.display = "none";
     setupContainer.style.display = "block";
   }
@@ -301,8 +303,6 @@ const screenController = (() => {
   function _startNewGame() {
     let playerXName = playerXField.value || "X";
     let playerOName = playerOField.value || "O";
-    playerXField.value = "";
-    playerOField.value = "";
     gameController.newGame(playerXName, playerOName);
 
     _renderGameScreen();
