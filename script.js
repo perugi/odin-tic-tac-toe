@@ -179,7 +179,6 @@ const gameController = (() => {
   }
 
   function newGame(playerXName, playerOName) {
-    console.log(playerXName);
     board.initializeBoard();
     players = [Player(playerXName, "X"), Player(playerOName, "O")];
     console.log(players);
@@ -191,7 +190,6 @@ const gameController = (() => {
   }
 
   function playRound(row, col) {
-    console.log("Play round");
     if (board.setCharacter(row, col, currentPlayer.symbol)) {
       board.printBoard();
 
@@ -301,7 +299,6 @@ const screenController = (() => {
   }
 
   function _startNewGame() {
-    console.log("Starting new game");
     let playerXName = playerXField.value || "X";
     let playerOName = playerOField.value || "O";
     playerXField.value = "";
