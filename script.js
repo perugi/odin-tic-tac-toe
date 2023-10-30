@@ -1,3 +1,37 @@
+const events = (() => {
+  let events = {};
+
+  function on(eventName, fn) {
+    events[eventName] = events[eventName] || [];
+    events[eventName].push(fn);
+  }
+
+  function off(eventName, fn) {
+    if (events[eventName]) {
+      for (var i = 0; i < events[eventName].length; i++) {
+        if (events[eventName][i] === fn) {
+          events[eventName].splice(i, 1);
+          break;
+        }
+      }
+    }
+  }
+
+  function emit(eventName, data) {
+    if (events[eventName]) {
+      events[eventName].forEach(function (fn) {
+        fn(data);
+      });
+    }
+  }
+
+  return {
+    on,
+    off,
+    emit,
+  };
+})();
+
 const Cell = () => {
   let value = " ";
 
@@ -157,14 +191,43 @@ const Gameboard = () => {
   };
 };
 
-const Player = (name, symbol) => {
-  return { name, symbol };
+const Player = (name, symbol, isAI) => {
+  return {
+    name,
+    symbol,
+    isAI,
+  };
+};
+
+const PlayerData = (playerXName, playerOName) => {
+  return {
+    playerXName,
+    playerOName,
+  };
+};
+
+const TurnData = (row, col) => {
+  return {
+    row,
+    col,
+  };
+};
+
+const GameData = (board, currentPlayer, winner) => {
+  return {
+    board,
+    currentPlayer,
+    winner,
+  };
 };
 
 const gameController = (() => {
   const board = Gameboard();
   let players;
   let currentPlayer;
+
+  events.on("newGame", newGame);
+  events.on("playRound", playRound);
 
   function _switchPlayerTurn() {
     currentPlayer = currentPlayer === players[0] ? players[1] : players[0];
@@ -178,35 +241,44 @@ const gameController = (() => {
     return winner;
   }
 
-  function newGame(playerXName, playerOName) {
+  function newGame(playerData) {
     board.initializeBoard();
-    players = [Player(playerXName, "X"), Player(playerOName, "O")];
-    console.log(players);
+    players = [
+      Player(playerData.playerXName, "X", false),
+      Player(playerData.playerOName, "O", false),
+    ];
     currentPlayer = players[0];
     winner = null;
 
     board.printBoard();
     console.log(`It's ${currentPlayer.name}'s turn.`);
+
+    events.emit("newGameSetUp", GameData(board, currentPlayer, winner));
   }
 
-  function playRound(row, col) {
-    if (board.setCharacter(row, col, currentPlayer.symbol)) {
+  function playRound(turnData) {
+    if (board.setCharacter(turnData.row, turnData.col, currentPlayer.symbol)) {
       board.printBoard();
 
       if (board.detectWinner()) {
         console.log(`${currentPlayer.name} wins!`);
         winner = currentPlayer.name;
-        return true;
-      }
-
-      if (board.isTie()) {
+      } else if (board.isTie()) {
         console.log("It's a tie!");
         winner = "tie";
-        return true;
+      } else {
+        console.log(`It's ${currentPlayer.name}'s turn.`);
+        _switchPlayerTurn();
       }
 
-      _switchPlayerTurn();
-      console.log(`It's ${currentPlayer.name}'s turn.`);
+      events.emit("roundFinished", GameData(board, currentPlayer, winner));
+      // if (currentPlayer.isAI) {
+      //   const row = Math.floor(Math.random() * 3);
+      //   const col = Math.floor(Math.random() * 3);
+      //   playRound(row, col);
+      // } else {
+      //   console.log(`It's ${currentPlayer.name}'s turn.`);
+      // }
       return true;
     }
     return false;
@@ -223,8 +295,10 @@ const gameController = (() => {
 
 const screenController = (() => {
   const setupContainer = document.querySelector(".setup-container");
-  const playerXField = document.querySelector(".playerX");
-  const playerOField = document.querySelector(".playerO");
+  const playerXNameInput = document.querySelector(".playerX");
+  const playerONameInput = document.querySelector(".playerO");
+  const playerXAiInput = document.querySelector("#playerX-ai");
+  const playerOAiInput = document.querySelector("#playerO-ai");
   const startButton = document.querySelector(".start-button");
   startButton.addEventListener("click", _startNewGame);
 
@@ -238,18 +312,23 @@ const screenController = (() => {
 
   _renderSetupScreen();
 
+  events.on("newGameSetUp", _renderGameScreen);
+  events.on("roundFinished", _renderGameScreen);
+
   function _renderSetupScreen() {
-    playerXField.value = "";
-    playerOField.value = "";
+    playerXNameInput.value = "";
+    playerONameInput.value = "";
+    playerXAiInput.value = false;
+    playerOAiInput.value = false;
     gameContainer.style.display = "none";
     setupContainer.style.display = "block";
   }
 
-  function _renderGameScreen() {
+  function _renderGameScreen(gameData) {
     gameContainer.style.display = "block";
     setupContainer.style.display = "none";
 
-    const board = gameController.getBoard();
+    let board = gameData.board.getBoard();
     gameboard.innerHTML = "";
 
     for (let i = 0; i < board.length; i++) {
@@ -270,11 +349,11 @@ const screenController = (() => {
       }
     }
 
-    if (gameController.getWinner()) {
-      if (gameController.getWinner() == "tie") {
+    if (gameData.winner) {
+      if (gameData.winner == "tie") {
         gameInfo.textContent = "It's a tie!";
       } else {
-        gameInfo.textContent = `${gameController.getWinner()} wins!`;
+        gameInfo.textContent = `${gameData.winner} wins!`;
       }
       gameboard.removeEventListener("click", _clickBoardCell);
 
@@ -284,9 +363,8 @@ const screenController = (() => {
         cell.removeEventListener("mouseleave", _clearPlaceholder);
       });
     } else {
-      gameInfo.textContent = `It's ${
-        gameController.getCurrentPlayer().name
-      }'s turn.`;
+      gameInfo.textContent = `It's ${gameData.currentPlayer.name}'s turn.`;
+      gameboard.addEventListener("click", _clickBoardCell);
     }
   }
 
@@ -294,19 +372,14 @@ const screenController = (() => {
     const row = e.target.dataset.row;
     const col = e.target.dataset.col;
 
-    if (gameController.playRound(row, col)) {
-      _renderGameScreen();
-      console.log(e.target);
-    }
+    events.emit("playRound", TurnData(row, col));
   }
 
   function _startNewGame() {
-    let playerXName = playerXField.value || "X";
-    let playerOName = playerOField.value || "O";
-    gameController.newGame(playerXName, playerOName);
+    let playerXName = playerXNameInput.value || "X";
+    let playerOName = playerONameInput.value || "O";
 
-    _renderGameScreen();
-    gameboard.addEventListener("click", _clickBoardCell);
+    events.emit("newGame", PlayerData(playerXName, playerOName));
   }
 
   function _fillPlaceholder() {
