@@ -181,6 +181,19 @@ const Gameboard = () => {
     return array.every((element) => element === array[0]);
   }
 
+  function getRandomEmptyCell() {
+    let emptyCells = [];
+    for (let i = 0; i < board.length; i++) {
+      for (let j = 0; j < board[0].length; j++) {
+        if (board[i][j].getValue() === " ") {
+          emptyCells.push({ row: i, col: j });
+        }
+      }
+    }
+
+    return emptyCells[Math.floor(Math.random() * emptyCells.length)];
+  }
+
   return {
     getBoard,
     setCharacter,
@@ -188,6 +201,7 @@ const Gameboard = () => {
     isTie,
     printBoard,
     initializeBoard,
+    getRandomEmptyCell,
   };
 };
 
@@ -199,10 +213,12 @@ const Player = (name, symbol, isAI) => {
   };
 };
 
-const PlayerData = (playerXName, playerOName) => {
+const PlayerData = (playerXName, playerXIsAi, playerOName, playerOIsAi) => {
   return {
     playerXName,
+    playerXIsAi,
     playerOName,
+    playerOIsAi,
   };
 };
 
@@ -244,9 +260,10 @@ const gameController = (() => {
   function newGame(playerData) {
     board.initializeBoard();
     players = [
-      Player(playerData.playerXName, "X", false),
-      Player(playerData.playerOName, "O", false),
+      Player(playerData.playerXName, "X", playerData.playerXIsAi),
+      Player(playerData.playerOName, "O", playerData.playerOIsAi),
     ];
+    console.log(players);
     currentPlayer = players[0];
     winner = null;
 
@@ -256,29 +273,35 @@ const gameController = (() => {
     events.emit("newGameSetUp", GameData(board, currentPlayer, winner));
   }
 
-  function playRound(turnData) {
+  async function playRound(turnData) {
     if (board.setCharacter(turnData.row, turnData.col, currentPlayer.symbol)) {
       board.printBoard();
 
       if (board.detectWinner()) {
         console.log(`${currentPlayer.name} wins!`);
         winner = currentPlayer.name;
+        currentPlayer = null;
       } else if (board.isTie()) {
         console.log("It's a tie!");
         winner = "tie";
+        currentPlayer = null;
       } else {
-        console.log(`It's ${currentPlayer.name}'s turn.`);
         _switchPlayerTurn();
       }
 
       events.emit("roundFinished", GameData(board, currentPlayer, winner));
-      // if (currentPlayer.isAI) {
-      //   const row = Math.floor(Math.random() * 3);
-      //   const col = Math.floor(Math.random() * 3);
-      //   playRound(row, col);
-      // } else {
-      //   console.log(`It's ${currentPlayer.name}'s turn.`);
-      // }
+      if (currentPlayer) {
+        if (currentPlayer.isAI) {
+          console.log(`AI ${currentPlayer.name} is thinking...`);
+          await sleep(1000);
+
+          const randomEmptyCell = board.getRandomEmptyCell();
+          playRound(TurnData(randomEmptyCell.row, randomEmptyCell.col));
+        } else {
+          console.log(`It's ${currentPlayer.name}'s turn.`);
+        }
+      }
+
       return true;
     }
     return false;
@@ -363,8 +386,13 @@ const screenController = (() => {
         cell.removeEventListener("mouseleave", _clearPlaceholder);
       });
     } else {
-      gameInfo.textContent = `It's ${gameData.currentPlayer.name}'s turn.`;
-      gameboard.addEventListener("click", _clickBoardCell);
+      if (gameData.currentPlayer.isAI) {
+        gameInfo.textContent = `AI ${gameData.currentPlayer.name} is thinking...`;
+        gameboard.removeEventListener("click", _clickBoardCell);
+      } else {
+        gameInfo.textContent = `It's ${gameData.currentPlayer.name}'s turn.`;
+        gameboard.addEventListener("click", _clickBoardCell);
+      }
     }
   }
 
@@ -379,7 +407,15 @@ const screenController = (() => {
     let playerXName = playerXNameInput.value || "X";
     let playerOName = playerONameInput.value || "O";
 
-    events.emit("newGame", PlayerData(playerXName, playerOName));
+    events.emit(
+      "newGame",
+      PlayerData(
+        playerXName,
+        playerXAiInput.checked,
+        playerOName,
+        playerOAiInput.checked
+      )
+    );
   }
 
   function _fillPlaceholder() {
@@ -396,3 +432,7 @@ const screenController = (() => {
 
   return {};
 })();
+
+function sleep(ms) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
