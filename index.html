@@ -9,27 +9,29 @@
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-    <header></header>
+    <header>
+        <div class="header">Tic Tac Toe</div>
+    </header>
     <main>
-    <div class="setup-container">
-        <div class="player-setup">
-            <input type="text" class="playerX" placeholder="X">
-            <label for="playerX-ai">AI</label>
-            <input type="checkbox" id="playerX-ai" class="ai-select">
+        <div class="setup-container">
+            <div class="player-setup">
+                <input type="text" class="playerX" placeholder="X">
+                <label for="playerX-ai">AI</label>
+                <input type="checkbox" id="playerX-ai" class="ai-select">
+            </div>
+            <div class="player-setup">
+                <input type="text" name="playerO" class="playerO" placeholder="O">
+                <label for="playerO-ai">AI</label>
+                <input type="checkbox" id="playerO-ai" class="ai-select">
+            </div>
+            <button class="start-button">Start Game</button>
         </div>
-        <div class="player-setup">
-            <input type="text" name="playerO" class="playerO" placeholder="O">
-            <label for="playerO-ai">AI</label>
-            <input type="checkbox" id="playerO-ai" class="ai-select">
+        <div class="game-container" style="display: none;">
+            <div class="game-info"></div>
+            <div class="gameboard"></div>
+            <button class="restart-button">Restart</button>
+            <button class="quit-button">Quit Game</button>
         </div>
-        <button class="start-button">Start Game</button>
-    </div>
-    <div class="game-container" style="display: none;">
-        <div class="game-info"></div>
-        <div class="gameboard"></div>
-        <button class="restart-button">Restart</button>
-        <button class="quit-button">Quit Game</button>
-    </div>
     </main>
     <footer>
         <div class="author">
