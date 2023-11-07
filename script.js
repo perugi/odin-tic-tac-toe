@@ -257,7 +257,7 @@ const gameController = (() => {
     return winner;
   }
 
-  function newGame(playerData) {
+  async function newGame(playerData) {
     board.initializeBoard();
     players = [
       Player(playerData.playerXName, "X", playerData.playerXIsAi),
@@ -268,9 +268,14 @@ const gameController = (() => {
     winner = null;
 
     board.printBoard();
-    console.log(`It's ${currentPlayer.name}'s turn.`);
 
     events.emit("newGameSetUp", GameData(board, currentPlayer, winner));
+
+    if (currentPlayer.isAI) {
+      _makeAiMove();
+    } else {
+      console.log(`It's ${currentPlayer.name}'s turn.`);
+    }
   }
 
   async function playRound(turnData) {
@@ -292,11 +297,7 @@ const gameController = (() => {
       events.emit("roundFinished", GameData(board, currentPlayer, winner));
       if (currentPlayer) {
         if (currentPlayer.isAI) {
-          console.log(`AI ${currentPlayer.name} is thinking...`);
-          await sleep(1000);
-
-          const randomEmptyCell = board.getRandomEmptyCell();
-          playRound(TurnData(randomEmptyCell.row, randomEmptyCell.col));
+          _makeAiMove();
         } else {
           console.log(`It's ${currentPlayer.name}'s turn.`);
         }
@@ -305,6 +306,13 @@ const gameController = (() => {
       return true;
     }
     return false;
+  }
+
+  async function _makeAiMove() {
+    console.log(`AI ${currentPlayer.name} is thinking...`);
+    await sleep(1000);
+    const randomEmptyCell = board.getRandomEmptyCell();
+    playRound(TurnData(randomEmptyCell.row, randomEmptyCell.col));
   }
 
   return {
