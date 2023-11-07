@@ -95,6 +95,7 @@ input[type="checkbox"] {
 
 button {
     font-size: 4vh;
+    padding: 0.1rem 0.5rem;
 }
 
 footer {
