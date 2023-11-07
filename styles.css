@@ -1,17 +1,30 @@
 * {
     box-sizing: border-box;
+    font-family: 'Amatic SC', sans-serif;
+}
+
+html {
+    font-size: 7vh;
 }
 
 body {
     height: 100vh;
     display: flex;
     flex-direction: column;
+    overflow: hidden;
 }
 
 header {
     display: flex;
     justify-content: center;
     align-items: center;
+    font-family: 'Amatic SC', sans-serif;
+    font-size: max(30px, 10vh);
+    font-weight: 700;
+    padding: max(10px, 2vh);
+    color: crimson;
+    background-color: #c4e5f5;
+    border-bottom: gray 1px solid;
 }
 
 main {
@@ -21,28 +34,75 @@ main {
     align-items: center;
 }
 
+.game-info {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding-bottom: 0.3rem;
+}
+
 .gameboard {
     display: grid;
-    grid-template-columns: repeat(3, 50px);
-    grid-auto-rows: 50px;
+    grid-template-columns: repeat(3, min(15vw, 15vh));
+    grid-auto-rows: min(15vw, 15vh);
 }
 
 .board-cell{
     display: flex;
     justify-content: center;
     align-items: center;
-    border: 1px solid black;
-    font-size: 30px;
+    border: 1px solid gray;
+    font-family: 'Indie Flower', cursive;
+    font-size: min(10vw, 10vh);
 }
 
 .empty {
     color: gray;
 }
 
+.player-setup {
+    display: flex;
+    align-items: center;
+    margin: 0.3rem 0;
+}
+
+input[type="text"] {
+    width: 5rem;
+    font-size: 1rem;
+    padding: 0.1rem;
+    text-align: center;
+}
+
+input[type="text"]:placeholder-shown {
+    caret-color: transparent;
+}
+
+label {
+    margin-left: 1rem;
+}
+
+input[type="checkbox"] {
+    width: 0.4rem;
+    height: 0.4rem;
+    margin-left: 0.3rem;
+}
+
+.buttons {
+    display: flex;
+    justify-content: space-evenly;
+    padding-top: 0.5rem;
+}
+
+button {
+    font-size: 4vh;
+}
+
 footer {
+    font-family: 'Amatic SC', sans-serif;
     display: flex;
     flex-direction: column;
     align-items: center;
+    font-size: 30px;
 }
 
 #gh-link {

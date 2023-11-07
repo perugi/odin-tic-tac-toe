@@ -7,10 +7,14 @@
     <script src="script.js" defer></script>
     <link rel="stylesheet" href="reset.css">
     <link rel="stylesheet" href="styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Amatic+SC:wght@400;700&family=Indie+Flower&display=swap"
+        rel="stylesheet">
 </head>
 <body>
     <header>
-        <div class="header">tic tac toe</div>
+        <div class="header">TIC TAC TOE</div>
     </header>
     <main>
         <div class="setup-container">
@@ -24,13 +28,17 @@
                 <label for="playerO-ai">AI</label>
                 <input type="checkbox" id="playerO-ai" class="ai-select">
             </div>
-            <button class="start-button">Start Game</button>
+            <div class="buttons">
+                <button class="start-button">Start Game</button>
+            </div>
         </div>
         <div class="game-container" style="display: none;">
             <div class="game-info"></div>
             <div class="gameboard"></div>
-            <button class="restart-button">Restart</button>
-            <button class="quit-button">Quit Game</button>
+            <div class="buttons">
+                <button class="restart-button">Restart</button>
+                <button class="quit-button">Quit Game</button>
+            </div>
         </div>
     </main>
     <footer>
