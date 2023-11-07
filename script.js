@@ -331,7 +331,10 @@ const screenController = (() => {
   const playerXAiInput = document.querySelector("#playerX-ai");
   const playerOAiInput = document.querySelector("#playerO-ai");
   const startButton = document.querySelector(".start-button");
-  startButton.addEventListener("click", _startNewGame);
+  startButton.addEventListener("click", () => {
+    events.on("roundFinished", _renderGameScreen);
+    _startNewGame();
+  });
 
   const gameContainer = document.querySelector(".game-container");
   const gameboard = document.querySelector(".gameboard");
@@ -339,7 +342,10 @@ const screenController = (() => {
   const restartButon = document.querySelector(".restart-button");
   restartButon.addEventListener("click", _startNewGame);
   const quitButton = document.querySelector(".quit-button");
-  quitButton.addEventListener("click", _renderSetupScreen);
+  quitButton.addEventListener("click", () => {
+    events.off("roundFinished", _renderGameScreen);
+    _renderSetupScreen();
+  });
 
   _renderSetupScreen();
 
